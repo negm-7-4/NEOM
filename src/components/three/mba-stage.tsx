@@ -36,7 +36,12 @@ export function MbaStage({ children }: { children: React.ReactNode }) {
       {/* Scene layer — decorative, never in the accessibility tree. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 -m-8 sm:-m-12"
+        /* `overflow-hidden` is the guard: whatever the scene layer renders —
+           canvas or CSS fallback — is clipped to the stage. The stage grows
+           sideways and downward but never upward: a negative top margin here
+           reaches into the headline line above, and the fallback's
+           backdrop-filter then blurs real text through it. */
+        className="pointer-events-none absolute inset-0 -z-10 -mx-6 -mb-6 overflow-hidden sm:-mx-10 sm:-mb-10"
       >
         {showCanvas ? (
           <GlassFrameScene

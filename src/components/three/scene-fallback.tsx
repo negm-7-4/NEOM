@@ -9,7 +9,15 @@
 export function SceneFallback() {
   return (
     <div aria-hidden className="absolute inset-0 grid place-items-center">
-      <div className="relative aspect-[16/10] w-[min(92%,620px)]">
+      {/*
+        Sized to the stage, not to a fixed aspect ratio. With `aspect-[16/10]`
+        the box could compute taller than the stage that contains it — the
+        stage's height comes from fluid MBA type — and the overflow painted
+        over the headline line above it, blurring real text through its
+        backdrop-filter. Filling the stage and capping the width keeps the
+        frame around the lettering instead of on top of its neighbours.
+      */}
+      <div className="relative h-full max-h-[min(100%,380px)] w-[min(92%,620px)]">
         {/* Back plate */}
         <div className="absolute inset-[14%] rounded-[36px] border border-white/45 bg-gradient-to-br from-white/35 to-cream/20 backdrop-blur-[6px]" />
         {/* Mid plate, offset to suggest depth */}
