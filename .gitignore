@@ -32,3 +32,6 @@ coverage/
 /.verify/captured-email.*
 /.verify/*.log
 /.verify/payload.json
+
+# generated static preview for hosting
+/.verify/pages/

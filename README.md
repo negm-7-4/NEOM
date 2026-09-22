@@ -46,6 +46,29 @@ curl http://localhost:3000/api/register
 
 ---
 
+## Deploy in one click
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fnegm-7-4%2FNEOM%2Ftree%2Fclaude%2Fneom-arabic-rtl-landing-x7htqv&project-name=neom-registration&repository-name=neom-registration&env=RESEND_API_KEY,OWNER_EMAIL,EMAIL_FROM&envDescription=Resend%20API%20key%2C%20the%20inbox%20that%20receives%20registrations%2C%20and%20a%20sender%20on%20a%20verified%20domain&envLink=https%3A%2F%2Fgithub.com%2Fnegm-7-4%2FNEOM%2Fblob%2Fclaude%2Fneom-arabic-rtl-landing-x7htqv%2FREADME.md%23email-configuration)
+
+The button clones this branch into your own Vercel account and prompts for the
+three email variables before the first build. Nothing else needs configuring —
+the `/api/register` route declares its own Node runtime.
+
+Prefer the terminal? From the repository root:
+
+```bash
+npx vercel --prod
+```
+
+Then add `RESEND_API_KEY`, `OWNER_EMAIL` and `EMAIL_FROM` under
+**Settings → Environment Variables** and redeploy.
+
+Either way, read **Email configuration** below first: Resend will not send from
+an unverified domain, so the sending domain has to be verified before a single
+registration can go out.
+
+---
+
 ## Email configuration
 
 ### 1. Verify a sending domain in Resend
