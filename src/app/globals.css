@@ -1,0 +1,263 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* ==========================================================================
+   NEOM design tokens
+   --------------------------------------------------------------------------
+   Palette: ivory → cream → sand → charcoal, with a single restrained green
+   used only for affirmative states (CTA, valid field, progress, icons).
+
+   Spacing: Tailwind's 4px base is kept so shadcn/ui primitives keep their
+   intended metrics, and an explicit 8px-step scale is layered on top as
+   `--space-*` tokens for the page rhythm (section padding, stack gaps).
+
+   Radii: 28–36px for section panels, 14–18px for inputs, per the brief.
+   ========================================================================== */
+
+@theme {
+  /* Surface + ink */
+  --color-ivory: #fbf8f2;
+  --color-cream: #f3ebdd;
+  --color-cream-deep: #eadfcb;
+  --color-sand: #e3d3b8;
+  --color-sand-deep: #c6ae86;
+  --color-charcoal: #1c211e;
+  --color-charcoal-soft: #39413a;
+  --color-muted: #6a7268;
+
+  /* Restrained green accent */
+  --color-verdant: #2f6b4f;
+  --color-verdant-light: #4e8f6c;
+  --color-verdant-pale: #e6efe8;
+
+  /* Feedback */
+  --color-danger: #a33a2c;
+  --color-danger-pale: #f7e9e6;
+
+  /* 8px step scale for page rhythm */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 40px;
+  --space-6: 48px;
+  --space-8: 64px;
+  --space-10: 80px;
+  --space-12: 96px;
+  --space-16: 128px;
+
+  /* Radii */
+  --radius-input: 16px;
+  --radius-card: 28px;
+  --radius-panel: 32px;
+  --radius-capsule: 999px;
+
+  /* Content width */
+  --container-content: 1120px;
+
+  /* Motion durations — interaction 180–250ms, entrance 450–700ms */
+  --duration-tap: 180ms;
+  --duration-interact: 220ms;
+  --duration-enter: 560ms;
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --font-sans: var(--font-arabic), "IBM Plex Sans Arabic", "Segoe UI", Tahoma,
+    "Noto Sans Arabic", system-ui, sans-serif;
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+@layer base {
+  * {
+    border-color: color-mix(in srgb, var(--color-sand-deep) 34%, transparent);
+  }
+
+  html {
+    /* Native scrolling only — no scroll hijacking anywhere in this project. */
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-cream);
+    color: var(--color-charcoal);
+    font-family: var(--font-sans);
+    /* 16px floor on body text, per the accessibility requirements. */
+    font-size: 1rem;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    /* A narrow phone must never scroll sideways. */
+    overflow-x: clip;
+  }
+
+  /* Inputs inherit the family and never drop below 16px — below that iOS
+     Safari zooms the viewport on focus, which breaks the RTL layout. */
+  input,
+  textarea,
+  select,
+  button {
+    font-family: inherit;
+    font-size: max(1rem, 16px);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-verdant);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background-color: color-mix(in srgb, var(--color-verdant) 24%, transparent);
+    color: var(--color-charcoal);
+  }
+
+  /* Latin runs inside Arabic text (MBA, Apostille, phone numbers) keep their
+     own direction without leaking bidi reordering into the sentence. */
+  [data-ltr] {
+    direction: ltr;
+    unicode-bidi: isolate;
+    text-align: start;
+  }
+}
+
+/* ==========================================================================
+   Glass surfaces
+   --------------------------------------------------------------------------
+   The look is built from five stacked ingredients rather than one translucent
+   fill: a two-stop gradient body, a backdrop blur + saturation lift, a
+   hairline edge, an inset top highlight and bottom shade, and an outer drop
+   shadow that lifts the panel off the scene. `--glass-alpha` lets each surface
+   tune only its opacity — the form panel is deliberately more opaque than the
+   decorative cards so field text stays readable over the background.
+   ========================================================================== */
+
+@utility glass {
+  position: relative;
+  background-image: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--color-ivory) calc(var(--glass-alpha, 58) * 1%), transparent),
+    color-mix(in srgb, var(--color-cream) calc(var(--glass-alpha, 58) * 0.82%), transparent)
+  );
+  backdrop-filter: blur(var(--glass-blur, 22px)) saturate(1.28);
+  -webkit-backdrop-filter: blur(var(--glass-blur, 22px)) saturate(1.28);
+  border: 1px solid color-mix(in srgb, #ffffff 52%, transparent);
+  box-shadow:
+    /* inset top highlight — the lit edge of the pane */
+    inset 0 1px 0 color-mix(in srgb, #ffffff 72%, transparent),
+    /* inset bottom shade — thickness */
+    inset 0 -1px 0 color-mix(in srgb, var(--color-sand-deep) 28%, transparent),
+    /* contact shadow */
+    0 2px 6px color-mix(in srgb, var(--color-charcoal) 6%, transparent),
+    /* cast shadow beneath the panel */
+    0 18px 40px -18px color-mix(in srgb, var(--color-charcoal) 30%, transparent);
+}
+
+/* A brighter rim light that follows the panel's top-left edge. */
+@utility glass-rim {
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      145deg,
+      color-mix(in srgb, #ffffff 88%, transparent),
+      transparent 42%,
+      transparent 62%,
+      color-mix(in srgb, var(--color-sand-deep) 42%, transparent)
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+}
+
+/* Decorative glass: the lightest surface — the scene reads straight through. */
+@utility glass-card {
+  --glass-alpha: 34;
+  --glass-blur: 14px;
+}
+
+/* Form glass: still the most opaque surface, as the brief requires, but tuned
+   down so the background stays visible behind it the way the reference does.
+   Field controls carry their own near-solid fill, so legibility comes from the
+   input surface rather than from flooding the whole panel. */
+@utility glass-form {
+  --glass-alpha: 62;
+  --glass-blur: 34px;
+}
+
+@utility glass-panel {
+  --glass-alpha: 42;
+  --glass-blur: 22px;
+}
+
+/* ==========================================================================
+   Layout helpers
+   ========================================================================== */
+
+@utility content-shell {
+  width: 100%;
+  max-width: var(--container-content);
+  margin-inline: auto;
+  /* 16px gutter holds the 360px floor without horizontal overflow. */
+  padding-inline: 16px;
+
+  @media (width >= 640px) {
+    padding-inline: 24px;
+  }
+  @media (width >= 1024px) {
+    padding-inline: 32px;
+  }
+}
+
+/* Minimum 44px touch target, applied to every interactive control. */
+@utility tap-target {
+  min-block-size: 44px;
+  min-inline-size: 44px;
+}
+
+/* ==========================================================================
+   Motion
+   --------------------------------------------------------------------------
+   Every CSS transition in the project is disabled under
+   `prefers-reduced-motion: reduce`. Motion-for-React components check the same
+   preference through `useReducedMotion`, and the 3D scene stops animating.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Screen-reader-only text that still receives focus when tabbed to. */
+@utility sr-only-focusable {
+  &:not(:focus):not(:focus-within) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border-width: 0;
+  }
+}
